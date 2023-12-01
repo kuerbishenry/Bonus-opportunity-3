@@ -1,0 +1,60 @@
+
+DP extension for cost of radios
+
+
+public static int hackerlandRadioTransmitters(List<Integer> x, int k, List<Integer> costs) {
+  // Write your code here
+       Collections.sort(x);
+       int n = x.size();
+
+
+       int[][] memo = new int[n][n];
+       for (int[] row : memo) {
+           Arrays.fill(row, -1);
+           }  
+          
+      return minTransmitters(0, -1, x, k, costs, memo);
+  }
+
+
+
+
+   private static int minTransmitters(int i, int lastCovered, List<Integer> x, int k, List<Integer> costs, int[][] memo) {
+       int n = x.size();
+       if (i >= n) return 0;
+
+
+       if (lastCovered != -1 && memo[i][lastCovered] != -1) {
+           return memo[i][lastCovered];
+       }
+
+
+       int result = -1;
+
+
+       // Find the farthest house that can be covered by placing a transmitter at the  current house's position
+       int nextIndex = i;
+       while (nextIndex < n && x.get(nextIndex) - x.get(i) <= k) {
+           nextIndex++;
+       }
+
+
+       // Calculate the cost of placing a transmitter at the current house
+       int costWithTransmitter = costs.get(i) + minTransmitters(nextIndex, nextIndex - 1, x, k, costs, memo);
+
+
+       // Calculate the cost of skipping the current house if it's already covered
+       int costWithoutTransmitter = (lastCovered != -1 && x.get(i) - x.get(lastCovered) <= k)
+       ? minTransmitters(i + 1, lastCovered, x, k, costs, memo)
+       : Integer.MAX_VALUE;
+
+
+       result = Math.min(costWithTransmitter, costWithoutTransmitter);
+
+
+       memo[i][lastCovered == -1 ? 0 : lastCovered] = result;
+       return result;
+
+
+   }
+}
